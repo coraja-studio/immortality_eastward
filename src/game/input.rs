@@ -6,17 +6,16 @@
 //! This example builds on top of several concepts introduced in other examples. In particular,
 //! the `default_controls`. `mouse_position`, and `action_state_resource` examples.
 
+use crate::AppSet;
 use bevy::{
     input::gamepad::GamepadEvent, input::keyboard::KeyboardInput, prelude::*, window::PrimaryWindow,
 };
 use leafwing_input_manager::{axislike::DualAxisData, prelude::*};
-use crate::AppSet;
 
 use super::spawn::player::Player;
 
 pub(super) fn plugin(app: &mut App) {
-    app
-        .add_plugins(InputManagerPlugin::<PlayerAction>::default())
+    app.add_plugins(InputManagerPlugin::<PlayerAction>::default())
         // Defined below, detects whether MKB or gamepad are active
         .add_plugins(InputModeManagerPlugin)
         .init_resource::<ActionState<PlayerAction>>()
@@ -25,8 +24,8 @@ pub(super) fn plugin(app: &mut App) {
         .add_systems(
             Update,
             player_mouse_look
-                        .in_set(AppSet::RecordInput)
-                        .run_if(in_state(ActiveInput::MouseKeyboard)),
+                .in_set(AppSet::RecordInput)
+                .run_if(in_state(ActiveInput::MouseKeyboard)),
         );
 }
 

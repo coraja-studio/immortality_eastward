@@ -3,9 +3,9 @@
 //! If you want to move the player in a smoother way,
 //! consider using a [fixed timestep](https://github.com/bevyengine/bevy/blob/latest/examples/movement/physics_in_fixed_timestep.rs).
 
+use super::input::PlayerAction;
 use bevy::{prelude::*, window::PrimaryWindow};
 use leafwing_input_manager::prelude::*;
-use super::input::PlayerAction;
 
 use crate::AppSet;
 
@@ -33,8 +33,8 @@ pub struct MovementController(pub Vec2);
 
 fn record_movement_controller(
     action_state: Res<ActionState<PlayerAction>>,
-    mut query: Query<&mut MovementController>) {
-
+    mut query: Query<&mut MovementController>,
+) {
     // Collect directional input.
     let mut intent = Vec2::ZERO;
 
@@ -42,13 +42,10 @@ fn record_movement_controller(
         // When the default input for `PlayerAction::Run` is pressed, print the clamped direction of the axis
         if action_state.pressed(&PlayerAction::Move) {
             intent = action_state
-            .clamped_axis_pair(&PlayerAction::Move)
-            .unwrap()
-            .xy();
-            println!(
-                "Moving in direction {}",
-                intent
-            );
+                .clamped_axis_pair(&PlayerAction::Move)
+                .unwrap()
+                .xy();
+            println!("Moving in direction {}", intent);
         }
 
         // When the default input for `PlayerAction::Dash` is pressed, print "Dash!"
