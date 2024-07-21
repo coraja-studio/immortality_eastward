@@ -1,5 +1,6 @@
 //! Spawn the melee enemies.
 
+use avian2d::prelude::*;
 use bevy::prelude::*;
 
 use crate::{
@@ -8,6 +9,7 @@ use crate::{
         assets::{HandleMap, ImageKey},
         behaviour::follow::FollowPlayer,
         movement::{Movement, MovementController},
+        GameLayer,
     },
     screen::Screen,
 };
@@ -63,6 +65,13 @@ fn spawn_melee_enemies(
             },
             animation,
             StateScoped(Screen::Playing),
+            RigidBody::Dynamic,
+            Collider::circle(10.0),
+            LockedAxes::ROTATION_LOCKED,
+            CollisionLayers::new(
+                GameLayer::Enemies,
+                [GameLayer::Enemies, GameLayer::LevelBounds],
+            ),
         ));
     }
 }

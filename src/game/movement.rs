@@ -4,6 +4,7 @@
 //! consider using a [fixed timestep](https://github.com/bevyengine/bevy/blob/latest/examples/movement/physics_in_fixed_timestep.rs).
 
 use super::input::PlayerAction;
+use avian2d::prelude::*;
 use bevy::prelude::*;
 use leafwing_input_manager::prelude::*;
 
@@ -25,7 +26,12 @@ pub(super) fn plugin(app: &mut App) {
     // Apply movement based on controls.
     app.register_type::<Movement>();
     app.add_systems(Update, apply_movement.in_set(AppSet::Update));
-    app.add_systems(Update, update_camera);
+    app.add_systems(
+        PostUpdate,
+        update_camera
+            .after(PhysicsSet::Sync)
+            .before(TransformSystem::TransformPropagate),
+    );
 }
 
 #[derive(Component, Reflect, Default)]
@@ -59,7 +65,9 @@ fn record_movement_controller(
 
         // Normalize so that diagonal movement has the same speed as
         // horizontal and vertical movement.
-        let intent = intent.normalize_or_zero();
+        if intent.length_squared() > 1.0 {
+            intent = intent.normalize_or_zero();
+        }
 
         // Apply movement intent to controllers.
         movement_controller.0 = intent;
@@ -78,18 +86,21 @@ pub struct Movement {
 
 fn apply_movement(
     time: Res<Time>,
-    mut movement_query: Query<(&MovementController, &Movement, &mut Transform)>,
+    mut movement_query: Query<(&MovementController, &Movement, &mut LinearVelocity)>,
 ) {
     for (controller, movement, mut transform) in &mut movement_query {
         let velocity = movement.speed * controller.0;
 
-        let mut translation: Vec3 = transform.translation;
-        translation += velocity.extend(0.0) * time.delta_seconds();
-        translation.y = translation
-            .y
-            .clamp(-VERTICAL_MOVEMENT_LIMIT, VERTICAL_MOVEMENT_LIMIT);
+        // let mut translation: Vec3 = transform.translation;
+        // translation += velocity.extend(0.0) * time.delta_seconds();
+        // translation.y = translation
+        //     .y
+        //     .clamp(-VERTICAL_MOVEMENT_LIMIT, VERTICAL_MOVEMENT_LIMIT);
 
-        transform.translation = translation;
+        // transform.translation = translation;
+
+        transform.x = velocity.x;
+        transform.y = velocity.y;
     }
 }
 

@@ -1,6 +1,9 @@
 //! Spawn the main level by triggering other observers.
 
+use avian2d::prelude::*;
 use bevy::prelude::*;
+
+use crate::game::GameLayer;
 
 use super::{melee_enemy::SpawnMeleeEnemy, player::SpawnPlayer};
 
@@ -35,6 +38,42 @@ fn spawn_level(
             stretch_value: 1.0,
         },
     ));
+
+    let square_sprite = Sprite {
+        color: Color::srgb(0.7, 0.7, 0.8),
+        custom_size: Some(Vec2::splat(50.0)),
+        ..default()
+    };
+    // Ceiling
+    commands.spawn((
+        SpriteBundle {
+            sprite: square_sprite.clone(),
+            transform: Transform::from_xyz(0.0, 250.0, 0.0).with_scale(Vec3::new(2000.0, 1.0, 1.0)),
+            ..default()
+        },
+        RigidBody::Static,
+        Collider::rectangle(50.0, 50.0),
+        CollisionLayers::new(
+            GameLayer::LevelBounds,
+            [GameLayer::Enemies, GameLayer::Player],
+        ),
+    ));
+    // Floor
+    commands.spawn((
+        SpriteBundle {
+            sprite: square_sprite.clone(),
+            transform: Transform::from_xyz(0.0, -250.0, 0.0)
+                .with_scale(Vec3::new(2000.0, 1.0, 1.0)),
+            ..default()
+        },
+        RigidBody::Static,
+        Collider::rectangle(50.0, 50.0),
+        CollisionLayers::new(
+            GameLayer::LevelBounds,
+            [GameLayer::Enemies, GameLayer::Player],
+        ),
+    ));
+
     commands.trigger(SpawnPlayer);
     commands.trigger(SpawnMeleeEnemy);
 }

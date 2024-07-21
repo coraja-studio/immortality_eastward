@@ -1,5 +1,6 @@
 //! Spawn the player.
 
+use avian2d::prelude::*;
 use bevy::prelude::*;
 
 use crate::{
@@ -7,6 +8,7 @@ use crate::{
         animation::PlayerAnimation,
         assets::{HandleMap, ImageKey},
         movement::{Movement, MovementController},
+        GameLayer,
     },
     screen::Screen,
 };
@@ -53,5 +55,8 @@ fn spawn_player(
         Movement { speed: 200.0 },
         player_animation,
         StateScoped(Screen::Playing),
+        RigidBody::Kinematic,
+        Collider::circle(10.0),
+        CollisionLayers::new(GameLayer::Player, GameLayer::LevelBounds),
     ));
 }
