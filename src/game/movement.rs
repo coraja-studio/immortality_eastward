@@ -107,8 +107,8 @@ fn update_camera(
         return;
     };
 
-    let Vec3 { x, y, .. } = player.translation;
-    let direction = Vec3::new(x, y, camera.translation.z);
+    let Vec3 { x, .. } = player.translation;
+    let direction = Vec3::new(x, camera.translation.y, camera.translation.z);
 
     // Applies a smooth effect to camera movement using interpolation between
     // the camera position and the player position on the x and y axes.

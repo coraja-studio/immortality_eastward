@@ -5,6 +5,7 @@
 use bevy::prelude::*;
 
 pub mod level;
+pub mod melee_enemy;
 pub mod player;
 
 pub(super) fn plugin(app: &mut App) {
