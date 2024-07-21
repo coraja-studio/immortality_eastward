@@ -8,6 +8,7 @@ pub mod audio;
 pub mod input;
 mod movement;
 pub mod spawn;
+pub mod behaviour;
 
 pub(super) fn plugin(app: &mut App) {
     app.add_plugins((
@@ -17,5 +18,6 @@ pub(super) fn plugin(app: &mut App) {
         input::plugin,
         movement::plugin,
         spawn::plugin,
+        behaviour::plugin,
     ));
 }

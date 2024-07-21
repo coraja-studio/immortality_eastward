@@ -5,9 +5,7 @@ use bevy::prelude::*;
 
 use crate::{
     game::{
-        animation::PlayerAnimation,
-        assets::{HandleMap, ImageKey},
-        movement::Movement,
+        animation::PlayerAnimation, assets::{HandleMap, ImageKey}, behaviour::follow::FollowPlayer, movement::{Movement, MovementController}
     },
     screen::Screen,
 };
@@ -55,7 +53,9 @@ fn spawn_melee_enemies(
                 layout: texture_atlas_layout.clone(),
                 index: animation.get_atlas_index(),
             },
+            MovementController::default(),
             Movement { speed: 100.0 },
+            FollowPlayer { until_distance: 5.0 },
             animation,
             StateScoped(Screen::Playing),
         ));

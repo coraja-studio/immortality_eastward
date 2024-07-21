@@ -34,7 +34,7 @@ pub struct MovementController(pub Vec2);
 
 fn record_movement_controller(
     action_state: Res<ActionState<PlayerAction>>,
-    mut query: Query<&mut MovementController>,
+    mut query: Query<&mut MovementController, With<Player>>,
 ) {
     // Collect directional input.
     let mut intent = Vec2::ZERO;
