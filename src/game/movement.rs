@@ -4,10 +4,16 @@
 //! consider using a [fixed timestep](https://github.com/bevyengine/bevy/blob/latest/examples/movement/physics_in_fixed_timestep.rs).
 
 use super::input::PlayerAction;
-use bevy::{prelude::*, window::PrimaryWindow};
+use bevy::prelude::*;
 use leafwing_input_manager::prelude::*;
 
+use super::spawn::player::Player;
 use crate::AppSet;
+
+const VERTICAL_MOVEMENT_LIMIT: f32 = 240.0;
+
+/// Camera lerp factor.
+const CAM_LERP_FACTOR: f32 = 2.;
 
 pub(super) fn plugin(app: &mut App) {
     // Record directional input as movement controls.
@@ -16,15 +22,10 @@ pub(super) fn plugin(app: &mut App) {
         Update,
         record_movement_controller.in_set(AppSet::RecordInput),
     );
-
     // Apply movement based on controls.
-    app.register_type::<(Movement, WrapWithinWindow)>();
-    app.add_systems(
-        Update,
-        (apply_movement, wrap_within_window)
-            .chain()
-            .in_set(AppSet::Update),
-    );
+    app.register_type::<Movement>();
+    app.add_systems(Update, apply_movement.in_set(AppSet::Update));
+    app.add_systems(Update, update_camera);
 }
 
 #[derive(Component, Reflect, Default)]
@@ -45,7 +46,6 @@ fn record_movement_controller(
                 .clamped_axis_pair(&PlayerAction::Move)
                 .unwrap()
                 .xy();
-            println!("Moving in direction {}", intent);
         }
 
         // When the default input for `PlayerAction::Dash` is pressed, print "Dash!"
@@ -82,23 +82,40 @@ fn apply_movement(
 ) {
     for (controller, movement, mut transform) in &mut movement_query {
         let velocity = movement.speed * controller.0;
-        transform.translation += velocity.extend(0.0) * time.delta_seconds();
+
+        let mut translation: Vec3 = transform.translation;
+        translation += velocity.extend(0.0) * time.delta_seconds();
+        translation.y = translation
+            .y
+            .clamp(-VERTICAL_MOVEMENT_LIMIT, VERTICAL_MOVEMENT_LIMIT);
+
+        transform.translation = translation;
     }
 }
 
-#[derive(Component, Reflect)]
-#[reflect(Component)]
-pub struct WrapWithinWindow;
-
-fn wrap_within_window(
-    window_query: Query<&Window, With<PrimaryWindow>>,
-    mut wrap_query: Query<&mut Transform, With<WrapWithinWindow>>,
+/// Update the camera position by tracking the player.
+fn update_camera(
+    mut camera: Query<&mut Transform, (With<Camera2d>, Without<Player>)>,
+    player: Query<&Transform, (With<Player>, Without<Camera2d>)>,
+    time: Res<Time>,
 ) {
-    let size = window_query.single().size() + 256.0;
-    let half_size = size / 2.0;
-    for mut transform in &mut wrap_query {
-        let position = transform.translation.xy();
-        let wrapped = (position + half_size).rem_euclid(size) - half_size;
-        transform.translation = wrapped.extend(transform.translation.z);
-    }
+    let Ok(mut camera) = camera.get_single_mut() else {
+        return;
+    };
+
+    let Ok(player) = player.get_single() else {
+        return;
+    };
+
+    let Vec3 { x, y, .. } = player.translation;
+    let direction = Vec3::new(x, y, camera.translation.z);
+
+    // Applies a smooth effect to camera movement using interpolation between
+    // the camera position and the player position on the x and y axes.
+    // Here we use the in-game time, to get the elapsed time (in seconds)
+    // since the previous update. This avoids jittery movement when tracking
+    // the player.
+    camera.translation = camera
+        .translation
+        .lerp(direction, time.delta_seconds() * CAM_LERP_FACTOR);
 }
