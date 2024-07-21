@@ -28,7 +28,7 @@ fn handle_damaging_contacts(
 
     for enemy_colliding_entities in &query {
         if enemy_colliding_entities.0.contains(&player_entity) {
-            player_health.hit_points -= 10.0;
+            player_health.hit_points -= 1.0;
         }
     }
 }
