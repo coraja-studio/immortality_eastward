@@ -1,11 +1,13 @@
-
 //! Spawn the melee enemies.
 
 use bevy::prelude::*;
 
 use crate::{
     game::{
-        animation::PlayerAnimation, assets::{HandleMap, ImageKey}, behaviour::follow::FollowPlayer, movement::{Movement, MovementController}
+        animation::PlayerAnimation,
+        assets::{HandleMap, ImageKey},
+        behaviour::follow::FollowPlayer,
+        movement::{Movement, MovementController},
     },
     screen::Screen,
 };
@@ -46,7 +48,8 @@ fn spawn_melee_enemies(
                 transform: Transform {
                     translation: translation,
                     scale: Vec3::splat(1.0),
-                    ..default()},
+                    ..default()
+                },
                 ..Default::default()
             },
             TextureAtlas {
@@ -55,7 +58,9 @@ fn spawn_melee_enemies(
             },
             MovementController::default(),
             Movement { speed: 100.0 },
-            FollowPlayer { until_distance: 5.0 },
+            FollowPlayer {
+                until_distance: 5.0,
+            },
             animation,
             StateScoped(Screen::Playing),
         ));

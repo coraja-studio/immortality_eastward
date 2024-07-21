@@ -5,10 +5,10 @@ use bevy::prelude::*;
 mod animation;
 pub mod assets;
 pub mod audio;
+pub mod behaviour;
 pub mod input;
 mod movement;
 pub mod spawn;
-pub mod behaviour;
 
 pub(super) fn plugin(app: &mut App) {
     app.add_plugins((
