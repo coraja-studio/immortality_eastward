@@ -49,7 +49,7 @@ fn spawn_melee_enemies(
             SpriteBundle {
                 texture: image_handles[&ImageKey::EvilDucky].clone_weak(),
                 transform: Transform {
-                    translation: translation,
+                    translation,
                     scale: Vec3::splat(1.0),
                     ..default()
                 },
