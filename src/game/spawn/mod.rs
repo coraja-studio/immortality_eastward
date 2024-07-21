@@ -9,5 +9,5 @@ pub mod melee_enemy;
 pub mod player;
 
 pub(super) fn plugin(app: &mut App) {
-    app.add_plugins((level::plugin, player::plugin));
+    app.add_plugins((level::plugin, player::plugin, melee_enemy::plugin));
 }

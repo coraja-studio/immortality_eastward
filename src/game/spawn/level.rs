@@ -2,7 +2,7 @@
 
 use bevy::prelude::*;
 
-use super::player::SpawnPlayer;
+use super::{melee_enemy::SpawnMeleeEnemy, player::SpawnPlayer};
 
 pub(super) fn plugin(app: &mut App) {
     app.observe(spawn_level);
@@ -35,5 +35,6 @@ fn spawn_level(
             stretch_value: 1.0,
         },
     ));
-    commands.trigger(SpawnPlayer)
+    commands.trigger(SpawnPlayer);
+    commands.trigger(SpawnMeleeEnemy);
 }
