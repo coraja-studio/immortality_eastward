@@ -8,6 +8,7 @@ use crate::{
         animation::PlayerAnimation,
         assets::{HandleMap, ImageKey},
         behaviour::follow::FollowPlayer,
+        health::Health,
         movement::{Movement, MovementController},
         GameLayer,
     },
@@ -70,8 +71,13 @@ fn spawn_melee_enemies(
             LockedAxes::ROTATION_LOCKED,
             CollisionLayers::new(
                 GameLayer::Enemies,
-                [GameLayer::Enemies, GameLayer::LevelBounds],
+                [
+                    GameLayer::Enemies,
+                    GameLayer::LevelBounds,
+                    GameLayer::PlayerHitbox,
+                ],
             ),
+            Health { hit_points: 100.0 },
         ));
     }
 }

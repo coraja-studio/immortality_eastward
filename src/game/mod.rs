@@ -7,6 +7,8 @@ mod animation;
 pub mod assets;
 pub mod audio;
 pub mod behaviour;
+mod damaging_contacts;
+pub mod health;
 pub mod input;
 mod kinematic_controller_collisions;
 mod movement;
@@ -14,7 +16,8 @@ pub mod spawn;
 
 #[derive(PhysicsLayer)]
 pub enum GameLayer {
-    Player,
+    PlayerMovement,
+    PlayerHitbox,
     Enemies,
     LevelBounds,
 }
@@ -25,10 +28,12 @@ pub(super) fn plugin(app: &mut App) {
         animation::plugin,
         audio::plugin,
         assets::plugin,
+        damaging_contacts::plugin,
         input::plugin,
         movement::plugin,
         spawn::plugin,
         behaviour::plugin,
+        health::plugin,
         kinematic_controller_collisions::plugin,
     ));
 }

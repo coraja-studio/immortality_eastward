@@ -7,6 +7,7 @@ use crate::{
     game::{
         animation::PlayerAnimation,
         assets::{HandleMap, ImageKey},
+        health::Health,
         movement::{Movement, MovementController},
         GameLayer,
     },
@@ -25,6 +26,10 @@ pub struct SpawnPlayer;
 #[reflect(Component)]
 pub struct Player;
 
+#[derive(Component, Debug, Clone, Copy, PartialEq, Eq, Default, Reflect)]
+#[reflect(Component)]
+pub struct PlayerHitBox;
+
 fn spawn_player(
     _trigger: Trigger<SpawnPlayer>,
     mut commands: Commands,
@@ -39,24 +44,38 @@ fn spawn_player(
     let texture_atlas_layout = texture_atlas_layouts.add(layout);
     let player_animation = PlayerAnimation::new();
 
-    commands.spawn((
-        Name::new("Player"),
-        Player,
-        SpriteBundle {
-            texture: image_handles[&ImageKey::Ducky].clone_weak(),
-            transform: Transform::from_scale(Vec3::splat(1.0)),
-            ..Default::default()
-        },
-        TextureAtlas {
-            layout: texture_atlas_layout.clone(),
-            index: player_animation.get_atlas_index(),
-        },
-        MovementController::default(),
-        Movement { speed: 200.0 },
-        player_animation,
-        StateScoped(Screen::Playing),
-        RigidBody::Kinematic,
-        Collider::circle(10.0),
-        CollisionLayers::new(GameLayer::Player, GameLayer::LevelBounds),
-    ));
+    let parent = commands
+        .spawn((
+            Name::new("Player"),
+            Player,
+            SpriteBundle {
+                texture: image_handles[&ImageKey::Ducky].clone_weak(),
+                transform: Transform::from_scale(Vec3::splat(1.0)),
+                ..Default::default()
+            },
+            TextureAtlas {
+                layout: texture_atlas_layout.clone(),
+                index: player_animation.get_atlas_index(),
+            },
+            MovementController::default(),
+            Movement { speed: 200.0 },
+            player_animation,
+            StateScoped(Screen::Playing),
+            RigidBody::Kinematic,
+            Collider::circle(10.0),
+            CollisionLayers::new(GameLayer::PlayerMovement, GameLayer::LevelBounds),
+            Health { hit_points: 1000.0 },
+        ))
+        .id();
+    let child = commands
+        .spawn((
+            Name::new("PlayerHitbox"),
+            PlayerHitBox,
+            RigidBody::Kinematic,
+            Collider::circle(10.0),
+            CollisionLayers::new(GameLayer::PlayerHitbox, GameLayer::Enemies),
+            Sensor,
+        ))
+        .id();
+    commands.entity(parent).push_children(&[child]);
 }

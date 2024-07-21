@@ -11,8 +11,6 @@ use leafwing_input_manager::prelude::*;
 use super::spawn::player::Player;
 use crate::AppSet;
 
-const VERTICAL_MOVEMENT_LIMIT: f32 = 240.0;
-
 /// Camera lerp factor.
 const CAM_LERP_FACTOR: f32 = 2.;
 
@@ -85,22 +83,11 @@ pub struct Movement {
 }
 
 fn apply_movement(
-    time: Res<Time>,
     mut movement_query: Query<(&MovementController, &Movement, &mut LinearVelocity)>,
 ) {
-    for (controller, movement, mut transform) in &mut movement_query {
+    for (controller, movement, mut linear_velocity) in &mut movement_query {
         let velocity = movement.speed * controller.0;
-
-        // let mut translation: Vec3 = transform.translation;
-        // translation += velocity.extend(0.0) * time.delta_seconds();
-        // translation.y = translation
-        //     .y
-        //     .clamp(-VERTICAL_MOVEMENT_LIMIT, VERTICAL_MOVEMENT_LIMIT);
-
-        // transform.translation = translation;
-
-        transform.x = velocity.x;
-        transform.y = velocity.y;
+        linear_velocity.0 = velocity;
     }
 }
 

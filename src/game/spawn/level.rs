@@ -55,7 +55,7 @@ fn spawn_level(
         Collider::rectangle(50.0, 50.0),
         CollisionLayers::new(
             GameLayer::LevelBounds,
-            [GameLayer::Enemies, GameLayer::Player],
+            [GameLayer::Enemies, GameLayer::PlayerMovement],
         ),
     ));
     // Floor
@@ -70,7 +70,7 @@ fn spawn_level(
         Collider::rectangle(50.0, 50.0),
         CollisionLayers::new(
             GameLayer::LevelBounds,
-            [GameLayer::Enemies, GameLayer::Player],
+            [GameLayer::Enemies, GameLayer::PlayerMovement],
         ),
     ));
 
