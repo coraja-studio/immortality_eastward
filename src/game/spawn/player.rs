@@ -1,5 +1,7 @@
 //! Spawn the player.
 
+use std::time::Duration;
+
 use avian2d::prelude::*;
 use bevy::prelude::*;
 
@@ -7,6 +9,7 @@ use crate::{
     game::{
         animation::PlayerAnimation,
         assets::{HandleMap, ImageKey},
+        dash::{Dash, DashController},
         health::Health,
         movement::{Movement, MovementController},
         ui::status_bar::definition::StatusBarDefinition,
@@ -59,7 +62,7 @@ fn spawn_player(
                 index: player_animation.get_atlas_index(),
             },
             MovementController::default(),
-            Movement { speed: 200.0 },
+            Movement::new(200.0),
             player_animation,
             StateScoped(Screen::Playing),
             RigidBody::Kinematic,
@@ -67,6 +70,13 @@ fn spawn_player(
             CollisionLayers::new(GameLayer::PlayerMovement, GameLayer::LevelBounds),
             Health::new(200.0),
             StatusBarDefinition::<Health>::default(),
+            DashController::new(),
+            Dash::new(
+                400.0,
+                Duration::from_millis(300),
+                Duration::from_millis(100),
+                Duration::new(3, 0),
+            ),
         ))
         .with_children(|parent| {
             parent.spawn((

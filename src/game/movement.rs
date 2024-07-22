@@ -24,12 +24,7 @@ pub(super) fn plugin(app: &mut App) {
     // Apply movement based on controls.
     app.register_type::<Movement>();
     app.add_systems(Update, apply_movement.in_set(AppSet::Update));
-    app.add_systems(
-        PostUpdate,
-        update_camera
-            .after(PhysicsSet::Sync)
-            .before(TransformSystem::TransformPropagate),
-    );
+    app.add_systems(PostUpdate, update_camera);
 }
 
 #[derive(Component, Reflect, Default)]
@@ -52,10 +47,6 @@ fn record_movement_controller(
                 .xy();
         }
 
-        // When the default input for `PlayerAction::Dash` is pressed, print "Dash!"
-        if action_state.just_pressed(&PlayerAction::Dash) {
-            println!("Dash!");
-        }
         // When the default input for `PlayerAction::Interact` is pressed, print "Interact!"
         if action_state.just_pressed(&PlayerAction::Interact) {
             println!("Interact!");
@@ -75,19 +66,31 @@ fn record_movement_controller(
 #[derive(Component, Reflect)]
 #[reflect(Component)]
 pub struct Movement {
-    /// Since Bevy's default 2D camera setup is scaled such that
-    /// one unit is one pixel, you can think of this as
-    /// "How many pixels per second should the player move?"
-    /// Note that physics engines may use different unit/pixel ratios.
+    pub controls_rigid_body: bool,
     pub speed: f32,
+}
+
+impl Movement {
+    pub fn new(speed: f32) -> Movement {
+        Movement {
+            controls_rigid_body: true,
+            speed,
+        }
+    }
+
+    pub fn toggle_control(&mut self, toggle: bool) {
+        self.controls_rigid_body = toggle;
+    }
 }
 
 fn apply_movement(
     mut movement_query: Query<(&MovementController, &Movement, &mut LinearVelocity)>,
 ) {
     for (controller, movement, mut linear_velocity) in &mut movement_query {
-        let velocity = movement.speed * controller.0;
-        linear_velocity.0 = velocity;
+        if movement.controls_rigid_body {
+            let velocity = movement.speed * controller.0;
+            linear_velocity.0 = velocity;
+        }
     }
 }
 

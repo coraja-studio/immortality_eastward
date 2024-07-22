@@ -8,6 +8,7 @@ pub mod assets;
 pub mod audio;
 pub mod behaviour;
 mod damaging_contacts;
+pub mod dash;
 pub mod health;
 pub mod input;
 mod kinematic_controller_collisions;
@@ -30,6 +31,7 @@ pub(super) fn plugin(app: &mut App) {
         audio::plugin,
         assets::plugin,
         damaging_contacts::plugin,
+        dash::plugin,
         input::plugin,
         movement::plugin,
         spawn::plugin,

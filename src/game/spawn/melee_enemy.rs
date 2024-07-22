@@ -61,7 +61,7 @@ fn spawn_melee_enemies(
                 index: animation.get_atlas_index(),
             },
             MovementController::default(),
-            Movement { speed: 100.0 },
+            Movement::new(100.0),
             FollowPlayer {
                 until_distance: 5.0,
             },
