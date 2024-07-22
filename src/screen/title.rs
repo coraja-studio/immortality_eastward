@@ -26,8 +26,8 @@ fn enter_title(mut commands: Commands) {
     commands
         .ui_root()
         .insert(StateScoped(Screen::Title))
-        .with_children(|children| {
-            children.button("Play").insert(TitleAction::Play);
+        .with_children(|children: &mut ChildBuilder| {
+            children.button("New cycle").insert(TitleAction::Play);
             children.button("Credits").insert(TitleAction::Credits);
 
             #[cfg(not(target_family = "wasm"))]

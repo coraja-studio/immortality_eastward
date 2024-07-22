@@ -30,7 +30,7 @@ impl Health {
 fn handle_death(mut commands: Commands, query: Query<(Entity, &Health)>) {
     for (entity, health) in query.iter() {
         if health.hit_points <= 0.0 {
-            commands.entity(entity).despawn();
+            commands.entity(entity).despawn_recursive();
         }
     }
 }
