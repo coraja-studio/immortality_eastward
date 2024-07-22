@@ -72,10 +72,10 @@ fn spawn_player(
             StatusBarDefinition::<Health>::default(),
             DashController::new(),
             Dash::new(
-                400.0,
-                Duration::from_millis(300),
+                600.0,
+                Duration::from_millis(200),
                 Duration::from_millis(100),
-                Duration::new(3, 0),
+                Duration::new(2, 0),
             ),
         ))
         .with_children(|parent| {
