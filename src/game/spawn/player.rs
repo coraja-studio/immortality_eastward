@@ -9,6 +9,7 @@ use crate::{
         assets::{HandleMap, ImageKey},
         health::Health,
         movement::{Movement, MovementController},
+        ui::status_bar::definition::StatusBarDefinition,
         GameLayer,
     },
     screen::Screen,
@@ -44,7 +45,7 @@ fn spawn_player(
     let texture_atlas_layout = texture_atlas_layouts.add(layout);
     let player_animation = PlayerAnimation::new();
 
-    let parent = commands
+    commands
         .spawn((
             Name::new("Player"),
             Player,
@@ -64,18 +65,17 @@ fn spawn_player(
             RigidBody::Kinematic,
             Collider::circle(10.0),
             CollisionLayers::new(GameLayer::PlayerMovement, GameLayer::LevelBounds),
-            Health { hit_points: 1000.0 },
+            Health::new(200.0),
+            StatusBarDefinition::<Health>::default(),
         ))
-        .id();
-    let child = commands
-        .spawn((
-            Name::new("PlayerHitbox"),
-            PlayerHitBox,
-            RigidBody::Kinematic,
-            Collider::circle(10.0),
-            CollisionLayers::new(GameLayer::PlayerHitbox, GameLayer::Enemies),
-            Sensor,
-        ))
-        .id();
-    commands.entity(parent).push_children(&[child]);
+        .with_children(|parent| {
+            parent.spawn((
+                Name::new("PlayerHitbox"),
+                PlayerHitBox,
+                SpatialBundle::default(),
+                Collider::circle(10.0),
+                CollisionLayers::new(GameLayer::PlayerHitbox, GameLayer::Enemies),
+                Sensor,
+            ));
+        });
 }

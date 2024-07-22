@@ -10,6 +10,7 @@ use crate::{
         behaviour::follow::FollowPlayer,
         health::Health,
         movement::{Movement, MovementController},
+        ui::status_bar::definition::StatusBarDefinition,
         GameLayer,
     },
     screen::Screen,
@@ -77,7 +78,8 @@ fn spawn_melee_enemies(
                     GameLayer::PlayerHitbox,
                 ],
             ),
-            Health { hit_points: 100.0 },
+            Health::new(100.0),
+            StatusBarDefinition::<Health>::default(),
         ));
     }
 }

@@ -13,6 +13,7 @@ pub mod input;
 mod kinematic_controller_collisions;
 mod movement;
 pub mod spawn;
+pub mod ui;
 
 #[derive(PhysicsLayer)]
 pub enum GameLayer {
@@ -35,5 +36,6 @@ pub(super) fn plugin(app: &mut App) {
         behaviour::plugin,
         health::plugin,
         kinematic_controller_collisions::plugin,
+        ui::plugin,
     ));
 }
