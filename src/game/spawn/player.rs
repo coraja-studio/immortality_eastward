@@ -1,5 +1,6 @@
 //! Spawn the player.
 
+use rand::prelude::*;
 use std::time::Duration;
 
 use avian2d::prelude::*;
@@ -63,6 +64,11 @@ fn spawn_player(
     let texture_atlas_layout = texture_atlas_layouts.add(layout);
     let player_animation = PlayerAnimation::new();
 
+    let mut rng = rand::thread_rng();
+    let redish = f32::lerp(0.3, 1.0, rng.gen());
+    let greenish = f32::lerp(0.3, 1.0, rng.gen());
+    let blueish = f32::lerp(0.0, 0.3, rng.gen());
+
     commands
         .spawn((
             StateScoped(Screen::Playing),
@@ -72,7 +78,11 @@ fn spawn_player(
                 sprite_bundle: SpriteBundle {
                     texture: image_handles[&ImageKey::ImmortalitySeeker2].clone_weak(),
                     transform: Transform::from_scale(Vec3::splat(1.0)),
-                    ..Default::default()
+                    sprite: Sprite {
+                        color: Color::srgb(redish, greenish, blueish),
+                        ..default()
+                    },
+                    ..default()
                 },
                 texture_atlas: TextureAtlas {
                     layout: texture_atlas_layout.clone(),
