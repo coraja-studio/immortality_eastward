@@ -48,7 +48,11 @@ impl DamageZoneBundle {
                 damage,
                 lifetime,
             },
-            collider: Collider::rectangle(circle_radius * 2.0, circle_radius),
+            collider: Collider::compound(vec![(
+                Vec2::X * 50.0,
+                0.0,
+                Collider::round_rectangle(circle_radius, circle_radius, 8.0),
+            )]),
             layers: CollisionLayers::new(own_layer, collides_with_layers),
             sensor: Sensor,
             damaged_entities: DamagedEntities(HashSet::new()),

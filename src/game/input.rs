@@ -79,13 +79,16 @@ impl Plugin for InputModeManagerPlugin {
             .add_systems(
                 Update,
                 activate_gamepad
-                .in_set(AppSet::PrepareInput)
-                .run_if(in_state(ActiveInput::MouseKeyboard)),
+                    .in_set(AppSet::PrepareInput)
+                    .run_if(in_state(ActiveInput::MouseKeyboard)),
             )
             // System to switch to MKB as active input
-            .add_systems(Update, activate_mkb
-                .in_set(AppSet::PrepareInput)
-                .run_if(in_state(ActiveInput::Gamepad)));
+            .add_systems(
+                Update,
+                activate_mkb
+                    .in_set(AppSet::PrepareInput)
+                    .run_if(in_state(ActiveInput::Gamepad)),
+            );
     }
 }
 

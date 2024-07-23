@@ -17,7 +17,13 @@ impl Plugin for AppPlugin {
         // Order new `AppStep` variants by adding them here:
         app.configure_sets(
             Update,
-            (AppSet::TickTimers, AppSet::PrepareInput, AppSet::RecordInput, AppSet::Update).chain(),
+            (
+                AppSet::TickTimers,
+                AppSet::PrepareInput,
+                AppSet::RecordInput,
+                AppSet::Update,
+            )
+                .chain(),
         );
 
         // Spawn the main camera.

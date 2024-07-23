@@ -20,6 +20,7 @@ pub enum ImageKey {
     Ducky,
     EvilDucky,
     ImmortalitySeeker2,
+    BaseAttack,
 }
 
 impl AssetKey for ImageKey {
@@ -52,6 +53,15 @@ impl FromWorld for HandleMap<ImageKey> {
                 ImageKey::ImmortalitySeeker2,
                 asset_server.load_with_settings(
                     "images/immortality_seeker_2.png",
+                    |settings: &mut ImageLoaderSettings| {
+                        settings.sampler = ImageSampler::nearest();
+                    },
+                ),
+            ),
+            (
+                ImageKey::BaseAttack,
+                asset_server.load_with_settings(
+                    "images/base_attack.png",
                     |settings: &mut ImageLoaderSettings| {
                         settings.sampler = ImageSampler::nearest();
                     },

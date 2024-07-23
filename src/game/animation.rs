@@ -27,6 +27,15 @@ pub(super) fn plugin(app: &mut App) {
                 .in_set(AppSet::Update),
         ),
     );
+
+    app.register_type::<AttackAnimation>();
+    app.add_systems(
+        Update,
+        (
+            update_attack_animation_timer.in_set(AppSet::TickTimers),
+            update_attack_animation_atlas.in_set(AppSet::Update),
+        )
+    );
 }
 
 /// Update the sprite direction and animation state (idling/walking).
@@ -157,5 +166,67 @@ impl PlayerAnimation {
             PlayerAnimationState::Idling => self.frame,
             PlayerAnimationState::Walking => 6 + self.frame,
         }
+    }
+}
+
+/// Update the animation timer.
+fn update_attack_animation_timer(time: Res<Time>, mut query: Query<&mut AttackAnimation>) {
+    for mut animation in &mut query {
+        animation.update_timer(time.delta());
+    }
+}
+
+/// Update the texture atlas to reflect changes in the animation.
+fn update_attack_animation_atlas(mut query: Query<(&AttackAnimation, &mut TextureAtlas)>) {
+    for (animation, mut atlas) in &mut query {
+        if animation.changed() {
+            atlas.index = animation.get_atlas_index();
+        }
+    }
+}
+
+/// Component that tracks attack's animation state.
+/// It is tightly bound to the texture atlas we use.
+#[derive(Component, Reflect)]
+#[reflect(Component)]
+pub struct AttackAnimation {
+    timer: Timer,
+    frame: usize,
+}
+
+impl AttackAnimation {
+    /// The number of frames.
+    const FRAMES: usize = 6;
+    /// The duration of each frame.
+    const INTERVAL: Duration = Duration::from_millis(60);
+
+    fn animating() -> Self {
+        Self {
+            timer: Timer::new(Self::INTERVAL, TimerMode::Once),
+            frame: 0,
+        }
+    }
+
+    pub fn new() -> Self {
+        Self::animating()
+    }
+
+    /// Update animation timers.
+    pub fn update_timer(&mut self, delta: Duration) {
+        self.timer.tick(delta);
+        if !self.timer.finished() {
+            return;
+        }
+        self.frame = (self.frame + 1) % Self::FRAMES;
+    }
+
+    /// Whether animation changed this tick.
+    pub fn changed(&self) -> bool {
+        self.timer.finished()
+    }
+
+    /// Return sprite index in the atlas.
+    pub fn get_atlas_index(&self) -> usize {
+        self.frame
     }
 }
