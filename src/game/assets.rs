@@ -19,6 +19,7 @@ pub(super) fn plugin(app: &mut App) {
 pub enum ImageKey {
     Ducky,
     EvilDucky,
+    ImmortalitySeeker2,
 }
 
 impl AssetKey for ImageKey {
@@ -42,6 +43,15 @@ impl FromWorld for HandleMap<ImageKey> {
                 ImageKey::EvilDucky,
                 asset_server.load_with_settings(
                     "images/evil_ducky.png",
+                    |settings: &mut ImageLoaderSettings| {
+                        settings.sampler = ImageSampler::nearest();
+                    },
+                ),
+            ),
+            (
+                ImageKey::ImmortalitySeeker2,
+                asset_server.load_with_settings(
+                    "images/immortality_seeker_2.png",
                     |settings: &mut ImageLoaderSettings| {
                         settings.sampler = ImageSampler::nearest();
                     },

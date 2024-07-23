@@ -109,7 +109,7 @@ impl PlayerAnimation {
     /// The number of walking frames.
     const WALKING_FRAMES: usize = 6;
     /// The duration of each walking frame.
-    const WALKING_INTERVAL: Duration = Duration::from_millis(50);
+    const WALKING_INTERVAL: Duration = Duration::from_millis(100);
 
     fn walking() -> Self {
         Self {
