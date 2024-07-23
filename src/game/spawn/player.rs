@@ -9,6 +9,7 @@ use crate::{
     game::{
         animation::PlayerAnimation,
         assets::{HandleMap, ImageKey},
+        attack::{Attack, AttackController},
         dash::{Dash, DashController},
         health::Health,
         movement::{Movement, MovementController},
@@ -34,6 +35,20 @@ pub struct Player;
 #[reflect(Component)]
 pub struct PlayerHitBox;
 
+#[derive(Bundle)]
+pub struct PlayerMoveCollisionBundle {
+    rigid_body: RigidBody,
+    collider: Collider,
+    collision_layers: CollisionLayers,
+}
+
+#[derive(Bundle)]
+pub struct PlayerAppearance {
+    sprite_bundle: SpriteBundle,
+    texture_atlas: TextureAtlas,
+    player_animation: PlayerAnimation,
+}
+
 fn spawn_player(
     _trigger: Trigger<SpawnPlayer>,
     mut commands: Commands,
@@ -50,24 +65,31 @@ fn spawn_player(
 
     commands
         .spawn((
+            StateScoped(Screen::Playing),
             Name::new("Player"),
             Player,
-            SpriteBundle {
-                texture: image_handles[&ImageKey::ImmortalitySeeker2].clone_weak(),
-                transform: Transform::from_scale(Vec3::splat(1.0)),
-                ..Default::default()
-            },
-            TextureAtlas {
-                layout: texture_atlas_layout.clone(),
-                index: player_animation.get_atlas_index(),
+            PlayerAppearance {
+                sprite_bundle: SpriteBundle {
+                    texture: image_handles[&ImageKey::ImmortalitySeeker2].clone_weak(),
+                    transform: Transform::from_scale(Vec3::splat(1.0)),
+                    ..Default::default()
+                },
+                texture_atlas: TextureAtlas {
+                    layout: texture_atlas_layout.clone(),
+                    index: player_animation.get_atlas_index(),
+                },
+                player_animation,
             },
             MovementController::default(),
             Movement::new(200.0),
-            player_animation,
-            StateScoped(Screen::Playing),
-            RigidBody::Kinematic,
-            Collider::circle(10.0),
-            CollisionLayers::new(GameLayer::PlayerMovement, GameLayer::LevelBounds),
+            PlayerMoveCollisionBundle {
+                rigid_body: RigidBody::Kinematic,
+                collider: Collider::circle(10.0),
+                collision_layers: CollisionLayers::new(
+                    GameLayer::PlayerMovement,
+                    GameLayer::LevelBounds,
+                ),
+            },
             Health::new(200.0),
             StatusBarDefinition::<Health>::default(),
             DashController::new(),
@@ -77,6 +99,8 @@ fn spawn_player(
                 Duration::from_millis(100),
                 Duration::new(2, 0),
             ),
+            Attack,
+            AttackController(false),
         ))
         .with_children(|parent| {
             parent.spawn((

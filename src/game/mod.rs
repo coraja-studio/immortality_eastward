@@ -5,8 +5,10 @@ use bevy::prelude::*;
 
 mod animation;
 pub mod assets;
+pub mod attack;
 pub mod audio;
 pub mod behaviour;
+pub mod damage_zone;
 mod damaging_contacts;
 pub mod dash;
 pub mod health;
@@ -30,6 +32,8 @@ pub(super) fn plugin(app: &mut App) {
         animation::plugin,
         audio::plugin,
         assets::plugin,
+        attack::plugin,
+        damage_zone::plugin,
         damaging_contacts::plugin,
         dash::plugin,
         input::plugin,

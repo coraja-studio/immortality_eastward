@@ -24,7 +24,12 @@ pub(super) fn plugin(app: &mut App) {
     // Apply movement based on controls.
     app.register_type::<Movement>();
     app.add_systems(Update, apply_movement.in_set(AppSet::Update));
-    app.add_systems(PostUpdate, update_camera);
+    app.add_systems(
+        PostUpdate,
+        update_camera
+            .after(PhysicsSet::Sync)
+            .before(TransformSystem::TransformPropagate),
+    );
 }
 
 #[derive(Component, Reflect, Default)]

@@ -15,7 +15,7 @@ pub(super) fn plugin(app: &mut App) {
 
 fn handle_damaging_contacts(
     mut events: EventWriter<DamageEvent>,
-    query: Query<&CollidingEntities, With<MeleeEnemy>>,
+    query: Query<(Entity, &CollidingEntities), With<MeleeEnemy>>,
     player_query: Query<Entity, (With<Health>, With<Player>)>,
     player_hit_box_query: Query<Entity, With<PlayerHitBox>>,
 ) {
@@ -27,9 +27,13 @@ fn handle_damaging_contacts(
         return;
     };
 
-    for enemy_colliding_entities in &query {
+    for (enemy_entity, enemy_colliding_entities) in &query {
         if enemy_colliding_entities.0.contains(&player_hitbox_entity) {
-            events.send(DamageEvent{damage: 1.0, target: player_entity});
+            events.send(DamageEvent {
+                damage: 1.0,
+                target: player_entity,
+                source: enemy_entity,
+            });
         }
     }
 }
