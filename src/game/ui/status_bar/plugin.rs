@@ -46,7 +46,6 @@ fn spawn<T: PercentageComponent>(
         if !status_bar_definition.is_added() {
             continue;
         }
-        println!("Spawning Health Bar!");
         commands.spawn(StatusBarBundle {
             material_mesh_bundle: MaterialMesh2dBundle {
                 mesh: meshes.add(Rectangle::default()).into(),

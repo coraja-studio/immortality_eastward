@@ -6,7 +6,11 @@ use leafwing_input_manager::prelude::*;
 
 use crate::AppSet;
 
-use super::{input::PlayerAction, movement::{Movement, MovementController}, spawn::player::Player};
+use super::{
+    input::PlayerAction,
+    movement::{Movement, MovementController},
+    spawn::player::Player,
+};
 
 pub(super) fn plugin(app: &mut App) {
     app.register_type::<DashController>();
@@ -99,23 +103,19 @@ impl Dash {
         match &mut self.state {
             DashState::Dashing(duration) => {
                 *duration = duration.saturating_sub(delta_time);
-                println!("duration: {duration:?}; deltaTime: {delta_time:?}");
                 if *duration <= Duration::ZERO {
-                    println!("Landing!");
                     self.state = DashState::Landing(self.landing_duration);
                 }
             }
             DashState::Landing(duration) => {
                 *duration = duration.saturating_sub(delta_time);
                 if *duration <= Duration::ZERO {
-                    println!("StartingCD!");
                     self.state = DashState::OnCooldown(self.cooldown);
                 }
             }
             DashState::OnCooldown(duration) => {
                 *duration = duration.saturating_sub(delta_time);
                 if *duration <= Duration::ZERO {
-                    println!("Ready!");
                     self.state = DashState::Ready;
                 }
             }
@@ -125,7 +125,6 @@ impl Dash {
 
     fn request_dash(&mut self) {
         if let DashState::Ready = self.state {
-            println!("Dashing!");
             self.state = DashState::Dashing(self.duration);
         }
     }
@@ -151,11 +150,11 @@ fn apply_dash(
             DashState::Dashing(_) => {
                 movement.toggle_control(false);
                 linear_velocity.0 = dash.speed * controller.last_direction;
-            },
+            }
             DashState::Landing(_) => {
                 movement.toggle_control(false);
                 linear_velocity.0 = Vec2::ZERO;
-            },
+            }
             DashState::OnCooldown(_) => movement.toggle_control(true),
             DashState::Ready => movement.toggle_control(true),
         }
