@@ -100,7 +100,10 @@ fn spawn_player(
                 Duration::new(2, 0),
             ),
             Attack,
-            AttackController(false),
+            AttackController {
+                look_direction: Vec2::X,
+                intent: false,
+            },
         ))
         .with_children(|parent| {
             parent.spawn((

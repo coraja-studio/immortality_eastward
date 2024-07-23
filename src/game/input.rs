@@ -24,7 +24,7 @@ pub(super) fn plugin(app: &mut App) {
         .add_systems(
             Update,
             player_mouse_look
-                .in_set(AppSet::RecordInput)
+                .in_set(AppSet::PrepareInput)
                 .run_if(in_state(ActiveInput::MouseKeyboard)),
         );
 }
@@ -78,10 +78,14 @@ impl Plugin for InputModeManagerPlugin {
             // System to switch to gamepad as active input
             .add_systems(
                 Update,
-                activate_gamepad.run_if(in_state(ActiveInput::MouseKeyboard)),
+                activate_gamepad
+                .in_set(AppSet::PrepareInput)
+                .run_if(in_state(ActiveInput::MouseKeyboard)),
             )
             // System to switch to MKB as active input
-            .add_systems(Update, activate_mkb.run_if(in_state(ActiveInput::Gamepad)));
+            .add_systems(Update, activate_mkb
+                .in_set(AppSet::PrepareInput)
+                .run_if(in_state(ActiveInput::Gamepad)));
     }
 }
 
@@ -143,22 +147,22 @@ fn player_mouse_look(
     // Then check if the ray intersects the plane defined by the player
     // Then finally compute the point along the ray to look at
     let player_position = player_transform.translation;
-    if let Some(p) = window
+    if let Some(cursor_in_world) = window
         .cursor_position()
         .and_then(|cursor| camera.viewport_to_world(camera_transform, cursor))
         .and_then(|ray| {
-            Some(ray).zip(ray.intersect_plane(player_position, InfinitePlane3d::new(Vec3::Y)))
+            Some(ray).zip(ray.intersect_plane(player_position, InfinitePlane3d::new(Vec3::Z)))
         })
         .map(|(ray, p)| ray.get_point(p))
     {
-        let diff = (p - player_position).xz();
+        let diff = (cursor_in_world - player_position).xy();
         if diff.length_squared() > 1e-3f32 {
             // Get the mutable action data to set the axis
             let action_data = action_state.action_data_mut_or_default(&PlayerAction::Look);
 
             // Flipping y sign here to be consistent with gamepad input.
             // We could also invert the gamepad y-axis
-            action_data.axis_pair = Some(DualAxisData::new(diff.x, -diff.y));
+            action_data.axis_pair = Some(DualAxisData::new(diff.x, diff.y));
 
             // Press the look action, so we can check that it is active
             action_state.press(&PlayerAction::Look);
