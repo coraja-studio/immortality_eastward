@@ -6,19 +6,13 @@ use leafwing_input_manager::prelude::*;
 
 use crate::AppSet;
 
-use super::{
-    input::PlayerAction,
-    movement::{Movement, MovementController},
-    spawn::player::Player,
-};
+use super::{input::PlayerAction, movement::Movement, spawn::player::Player};
+
+const DASH_ROTATION_SPEED: f32 = 7.5;
 
 pub(super) fn plugin(app: &mut App) {
     app.register_type::<DashController>();
     app.add_systems(Update, record_dash_controller.in_set(AppSet::RecordInput));
-    app.add_systems(
-        Update,
-        update_dash_controller_direction.in_set(AppSet::RecordInput),
-    );
 
     app.register_type::<Dash>();
     app.add_systems(Update, apply_dash.in_set(AppSet::Update));
@@ -46,15 +40,19 @@ fn record_dash_controller(
 ) {
     for mut dash_controller in &mut query {
         dash_controller.intent = action_state.just_pressed(&PlayerAction::Dash);
-    }
-}
 
-fn update_dash_controller_direction(
-    mut query: Query<(&mut DashController, &MovementController), With<Player>>,
-) {
-    for (mut dash_controller, movement_controller) in query.iter_mut() {
-        if movement_controller.0.length_squared() > 0.05 {
-            dash_controller.last_direction = movement_controller.0.normalize_or_zero();
+        let mut intent = Vec2::ZERO;
+
+        if action_state.pressed(&PlayerAction::Move) {
+            intent = action_state
+                .clamped_axis_pair(&PlayerAction::Move)
+                .unwrap()
+                .xy();
+        }
+
+        if intent.length_squared() > 0.05 {
+            intent = intent.normalize_or_zero();
+            dash_controller.last_direction = intent;
         }
     }
 }
@@ -149,7 +147,17 @@ fn apply_dash(
         match dash.state {
             DashState::Dashing(_) => {
                 movement.toggle_control(false);
-                linear_velocity.0 = dash.speed * controller.last_direction;
+                if linear_velocity.length_squared() <= 0.05 {
+                    linear_velocity.0 = dash.speed * controller.last_direction;
+                } else {
+                    let intent_angle = linear_velocity.angle_between(controller.last_direction);
+                    let max_angle = DASH_ROTATION_SPEED * time.delta_seconds();
+                    let angle = f32::clamp(intent_angle, -max_angle, max_angle);
+                    let new_direction = Vec2::from_angle(angle)
+                        .rotate(linear_velocity.xy())
+                        .normalize_or_zero();
+                    linear_velocity.0 = dash.speed * new_direction;
+                }
             }
             DashState::Landing(_) => {
                 movement.toggle_control(false);

@@ -7,6 +7,9 @@ use crate::game::GameLayer;
 
 use super::{melee_enemy::SpawnMeleeEnemy, player::SpawnPlayer};
 
+pub const LEVEL_HEIGHT: f32 = 700.0;
+const WALL_THICKNESS: f32 = 50.0;
+
 pub(super) fn plugin(app: &mut App) {
     app.observe(spawn_level);
 }
@@ -41,18 +44,19 @@ fn spawn_level(
 
     let square_sprite = Sprite {
         color: Color::srgb(0.7, 0.7, 0.8),
-        custom_size: Some(Vec2::splat(50.0)),
+        custom_size: Some(Vec2::splat(WALL_THICKNESS)),
         ..default()
     };
     // Ceiling
     commands.spawn((
         SpriteBundle {
             sprite: square_sprite.clone(),
-            transform: Transform::from_xyz(0.0, 250.0, 0.0).with_scale(Vec3::new(2000.0, 1.0, 1.0)),
+            transform: Transform::from_xyz(0.0, (LEVEL_HEIGHT + WALL_THICKNESS) * 0.5, 0.0)
+                .with_scale(Vec3::new(2000.0, 1.0, 1.0)),
             ..default()
         },
         RigidBody::Static,
-        Collider::rectangle(50.0, 50.0),
+        Collider::rectangle(WALL_THICKNESS, WALL_THICKNESS),
         CollisionLayers::new(
             GameLayer::LevelBounds,
             [GameLayer::Enemies, GameLayer::PlayerMovement],
@@ -62,12 +66,12 @@ fn spawn_level(
     commands.spawn((
         SpriteBundle {
             sprite: square_sprite.clone(),
-            transform: Transform::from_xyz(0.0, -250.0, 0.0)
+            transform: Transform::from_xyz(0.0, -(LEVEL_HEIGHT + WALL_THICKNESS) * 0.5, 0.0)
                 .with_scale(Vec3::new(2000.0, 1.0, 1.0)),
             ..default()
         },
         RigidBody::Static,
-        Collider::rectangle(50.0, 50.0),
+        Collider::rectangle(WALL_THICKNESS, WALL_THICKNESS),
         CollisionLayers::new(
             GameLayer::LevelBounds,
             [GameLayer::Enemies, GameLayer::PlayerMovement],

@@ -77,7 +77,7 @@ fn spawn_player(
             PlayerAppearance {
                 sprite_bundle: SpriteBundle {
                     texture: image_handles[&ImageKey::ImmortalitySeeker2].clone_weak(),
-                    transform: Transform::from_scale(Vec3::splat(1.0)),
+                    transform: Transform::from_scale(Vec3::splat(2.0)),
                     sprite: Sprite {
                         color: Color::srgb(redish, greenish, blueish),
                         ..default()

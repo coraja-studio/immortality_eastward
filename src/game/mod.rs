@@ -28,7 +28,7 @@ pub enum GameLayer {
 
 pub(super) fn plugin(app: &mut App) {
     app.add_plugins((
-        PhysicsPlugins::default(),
+        PhysicsPlugins::default().with_length_unit(10.0),
         animation::plugin,
         audio::plugin,
         assets::plugin,

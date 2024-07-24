@@ -34,7 +34,7 @@ pub(super) fn plugin(app: &mut App) {
         (
             update_attack_animation_timer.in_set(AppSet::TickTimers),
             update_attack_animation_atlas.in_set(AppSet::Update),
-        )
+        ),
     );
 }
 

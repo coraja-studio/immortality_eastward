@@ -40,30 +40,19 @@ fn record_movement_controller(
     action_state: Res<ActionState<PlayerAction>>,
     mut query: Query<&mut MovementController, With<Player>>,
 ) {
-    // Collect directional input.
-    let mut intent = Vec2::ZERO;
-
     for mut movement_controller in &mut query {
-        // When the default input for `PlayerAction::Run` is pressed, print the clamped direction of the axis
+        let mut intent = Vec2::ZERO;
+
         if action_state.pressed(&PlayerAction::Move) {
             intent = action_state
                 .clamped_axis_pair(&PlayerAction::Move)
                 .unwrap()
                 .xy();
         }
-
-        // When the default input for `PlayerAction::Interact` is pressed, print "Interact!"
-        if action_state.just_pressed(&PlayerAction::Interact) {
-            println!("Interact!");
-        }
-
-        // Normalize so that diagonal movement has the same speed as
-        // horizontal and vertical movement.
         if intent.length_squared() > 1.0 {
             intent = intent.normalize_or_zero();
         }
 
-        // Apply movement intent to controllers.
         movement_controller.0 = intent;
     }
 }

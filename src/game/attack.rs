@@ -59,7 +59,7 @@ fn apply_attack(
         let attack_transform = Transform {
             translation: transform.translation,
             rotation: Quat::from_rotation_z(Vec2::X.angle_between(controller.look_direction)),
-            ..default()
+            scale: Vec2::splat(2.0).extend(1.0),
         };
 
         let layout = TextureAtlasLayout::from_grid(UVec2::splat(32), 6, 1, Some(UVec2::ZERO), None);
