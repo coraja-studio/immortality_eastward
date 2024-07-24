@@ -15,13 +15,7 @@ impl Percentage {
     }
 
     fn clamp(value: f32) -> f32 {
-        if value < 0.0 {
-            0.0
-        } else if value > 1.0 {
-            1.0
-        } else {
-            value
-        }
+        f32::clamp(value, 0.0, 1.0)
     }
 }
 

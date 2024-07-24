@@ -33,6 +33,7 @@ impl Health {
 pub struct DamageEvent {
     pub damage: f32,
     pub target: Entity,
+    #[allow(dead_code)]
     pub source: Entity,
 }
 

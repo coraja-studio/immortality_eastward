@@ -57,18 +57,13 @@ fn record_dash_controller(
     }
 }
 
-#[derive(Reflect)]
+#[derive(Reflect, Default)]
 pub enum DashState {
+    #[default]
     Ready,
     Dashing(Duration),
     Landing(Duration),
     OnCooldown(Duration),
-}
-
-impl Default for DashState {
-    fn default() -> Self {
-        DashState::Ready
-    }
 }
 
 #[derive(Component, Reflect, Default)]
